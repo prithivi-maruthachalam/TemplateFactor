@@ -1,0 +1,19 @@
+{
+  "name": "@prithivimaruthachalam/templatefactory",
+  "version": "1.0.0",
+  "description": "An npm package for creating and using templates of folder structures",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prithivi-maruthachalam/TemplateFactory.git"
+  },
+  "author": "prithivimaruthachalam@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/prithivi-maruthachalam/TemplateFactory/issues"
+  },
+  "homepage": "https://github.com/prithivi-maruthachalam/TemplateFactory#readme"
+}
