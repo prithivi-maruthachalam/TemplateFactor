@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/prithivi-maruthachalam/TemplateFactory/issues"
   },
-  "homepage": "https://github.com/prithivi-maruthachalam/TemplateFactory#readme"
+  "homepage": "https://github.com/prithivi-maruthachalam/TemplateFactory#readme",
+  "dependencies": {
+    "chalk": "^5.1.2",
+    "commander": "^9.4.1",
+    "conf": "^10.2.0"
+  }
 }
