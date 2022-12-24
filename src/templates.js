@@ -3,6 +3,8 @@ const path = require('path');
 const fs = require('fs');
 const {hasOverlappingKeys} = require('./utils');
 const cloneDeep = require('lodash.clonedeep');
+const dirTree = require('directory-tree');
+const globToRegexp = require('glob-to-regexp');
 
 let ERR_STR = '';
 const DEFAULT_FILE = 'tf.config.json';
@@ -51,15 +53,22 @@ const getConfig = (configFilePath, targetDirectory) => {
 
     // get the content of the configuration file
     configContent = JSON.parse(fs.readFileSync(configFilePath));
+
+    // todo: validate configuration
   }
 
   return configContent;
 };
 
-const createTemplate = (targetDirectoryPath, options) => {
-  // get target directory and validate
-  const targetDirectory = path.resolve(targetDirectoryPath);
-
+/**
+ * Validates and sets up directories, configuration and
+ * options for the create command
+ *
+ * @param {String} targetDirectory
+ * @param {Object} options
+ * @return {Object}
+ */
+const setupCreateTemplate = (targetDirectory, options) => {
   if (!fs.existsSync(targetDirectory)) {
     ERR_STR = `Directory ${targetDirectory} does not exist`;
     throw new Error(ERR_STR);
@@ -86,7 +95,29 @@ const createTemplate = (targetDirectoryPath, options) => {
     functionalOptions[optionKey] = cmdOptions[optionKey];
   });
 
-  console.debug(functionalOptions);
+  return functionalOptions;
 };
+
+const createTemplate = (targetDirectoryPath, options) => {
+  const targetDirectory = path.resolve(targetDirectoryPath);
+  optionsConfig = setupCreateTemplate(targetDirectory, options);
+
+  console.debug('Options and Configuration', optionsConfig);
+
+  // object to store all template information in
+  const templateObject = {};
+
+  // name of the template
+  templateObject.name = optionsConfig.name ?? path.basename(targetDirectory);
+
+
+  //   const tree = dirTree(targetDirectory, {
+  //     exclude: [/\.git/, /node_modules/]
+  //   })
+  //   console.log(tree)
+
+  // todo: must validate templateObject before saving
+};
+
 
 module.exports = {createTemplate};

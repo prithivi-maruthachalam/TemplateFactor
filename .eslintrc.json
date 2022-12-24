@@ -11,5 +11,16 @@
         "ecmaVersion": "latest"
     },
     "rules": {
+        "max-len": [
+            "error",
+            {
+                "ignoreComments": true,
+                "ignoreUrls": true,
+                "ignoreStrings": true,
+                "ignoreTemplateLiterals": true
+            }
+        ],
+        "require-jsdoc":"warn",
+        "no-unused-vars": "warn"
     }
 }

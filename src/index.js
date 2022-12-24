@@ -1,16 +1,13 @@
 #! /usr/bin/env node
 
-const {Command} = require('commander');
-const {createTemplate} = require('./templates');
-
+const {Command} = require('commander'); // to parse command line arguments
+const {CreateTemplateCommand} = require('./createTemplateCommand');
 
 /**
  * Sets up and parses command line arguments using commander
- *
- * @return {Command}
  */
 const setupCmdArgs = () => {
-  const cliProgram = new Command();
+  const cliProgram = new Command(); // set up new command line parser
 
   cliProgram
       .name('templatefactory')
@@ -21,28 +18,29 @@ const setupCmdArgs = () => {
   cliProgram
       .showHelpAfterError();
 
-  // create-template command
+  // command : create
   cliProgram
       .command('create')
       .description('create template from folder')
-      .argument('<targetDirectory>', 'source directory for template')
+      .argument('<src>', 'source directory for template')
       .option('-n, --name <templateName>', 'name for the new template')
-      .option('-f, --saveFiles', 'to include files in the template or not')
-      .option('-x, --saveFileContent',
-          'to include file content in the template or not')
       .option('-cf, --config <file>', 'path to configuration file')
-      .action((targetDirectory, options, command) => {
-        return createTemplate(targetDirectory, options);
+      // flags
+      .option('-f', 'to include files in the template')
+      .option('-x', 'to include file content in the template')
+      .option('-s', 'to optimize storage for storing file content')
+      .action((srcDir, options) => {
+        const createTemplateCommand = new CreateTemplateCommand(
+            srcDir,
+            options,
+        );
+        createTemplateCommand.run();
       });
 
   cliProgram.parse();
-
-  return cliProgram;
 };
 
 /**
  * main
  */
-console.log('\n');
 setupCmdArgs();
-console.log('\n');
