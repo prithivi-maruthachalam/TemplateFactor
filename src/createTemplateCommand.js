@@ -26,13 +26,6 @@ class CreateTemplateCommand {
     // Get validated configuration
     this.fullConfiguration = this.#getConfig(options.config);
 
-    // Convert all excluded glob patterns to regexp
-    const excludes = this.fullConfiguration.exclude ?? [];
-    this.fullConfiguration.exclude = [];
-    excludes.forEach((globPattern) => {
-      this.fullConfiguration.exclude.push(globToRegexp(globPattern));
-    });
-
     // Extract all options except config
     const optionsObject = (({config, ...obj}) => obj)(options);
 
@@ -41,14 +34,43 @@ class CreateTemplateCommand {
       this.fullConfiguration[optionKey] = optionsObject[optionKey];
     });
 
-    console.debug(this.fullConfiguration);
-    // Get fs tree
-    const fsTree = dirTree(this.absoluteSrcDir, {
-      exclude: this.fullConfiguration.exclude ?? [],
-    });
-    console.debug(JSON.stringify(fsTree, null, 2));
+    // resolve name
+    if (!this.fullConfiguration.name) {
+      this.fullConfiguration.name = path.basename(this.absoluteSrcDir);
+    }
+
+    // todo: check if name already exists
+
+    this.#getDirTree();
   }
 
+  /**
+   * Parses the configuration and returns a dir tree of the source directory
+   * 
+   * @return {Object} Tree representing the dir structure
+   */
+  #getDirTree() {
+    const excludes = this.fullConfiguration.exclude ?? []; // Copy existing excludes
+
+    // Create new excludes list with reqex for default config file
+    this.fullConfiguration.exclude = [
+      globToRegexp(path.join(this.absoluteSrcDir, DEFAULT_FILE)),
+    ];
+
+    // Convert all glob expressions to regex
+    excludes.forEach((globPattern) => {
+      this.fullConfiguration.exclude.push(
+          globToRegexp(path.join(this.absoluteSrcDir, globPattern.replace(/\/$/, ''))),
+      );
+    });
+
+    // Get fs tree of source folder
+    const fsTree = dirTree(this.absoluteSrcDir,
+        {exclude: this.fullConfiguration.exclude},
+    );
+    
+    return fsTree;
+  }
 
   /**
    * Fetches and validates configuration
