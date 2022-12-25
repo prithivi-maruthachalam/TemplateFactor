@@ -8,7 +8,13 @@ const CONFIGURATION_SCHEMA = Joi.object({
   saveFiles: Joi.boolean().default(false),
   saveFileContent: Joi.boolean().default(false),
   optimizeStorage: Joi.boolean().default(false),
-  exclude: Joi.array().has(Joi.string()),
+  exclude: Joi.array().items(Joi.string().custom((value, helper) => {
+    if (checkGlob(value)) {
+      return true;
+    } else {
+      return helper.message(`\'${value}\' is not a valid glob pattern`);
+    }
+  })),
 });
 
 /**

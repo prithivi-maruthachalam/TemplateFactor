@@ -26,15 +26,14 @@ const setupCmdArgs = () => {
       .option('-n, --name <templateName>', 'name for the new template')
       .option('-cf, --config <file>', 'path to configuration file')
       // flags
-      .option('-f', 'to include files in the template')
-      .option('-x', 'to include file content in the template')
-      .option('-s', 'to optimize storage for storing file content')
+      .option('-f, --saveFiles', 'to include files in the template')
+      .option('-x, --saveFileContent', 'to include file content in the template')
+      .option('-s, --optimizeStorage', 'to optimize storage for storing file content')
       .action((srcDir, options) => {
-        const createTemplateCommand = new CreateTemplateCommand(
+        new CreateTemplateCommand(
             srcDir,
             options,
         );
-        createTemplateCommand.run();
       });
 
   cliProgram.parse();

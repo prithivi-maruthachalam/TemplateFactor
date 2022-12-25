@@ -23,9 +23,7 @@
     "directory-tree": "^3.5.1",
     "glob-to-regexp": "^0.4.1",
     "is-valid-glob": "^1.0.0",
-    "joi": "^17.7.0",
-    "lodash": "^4.17.21",
-    "lodash.clonedeep": "^4.5.0"
+    "joi": "^17.7.0"
   },
   "devDependencies": {
     "eslint": "^8.30.0",

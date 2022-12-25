@@ -1,14 +1,15 @@
 /**
  * An unknown error occurred
+ * @class
  */
 class UnknownError extends Error {
   /**
-   *
+   * @constructor
    */
   constructor() {
     super(`An unknown error occurred`);
 
-    // use the name of the class as the name of the error
+    // Use the name of the class as the name of the error
     this.name = this.constructor.name;
 
     this.applicationErrorCode = 0;
@@ -17,15 +18,16 @@ class UnknownError extends Error {
 
 /**
  * Folder does not exist
+ * @class
  */
 class DirectoryDoesNotExist extends Error {
   /**
-     * @param {String} folder path to the folder
-     */
+   * @constructor
+   * @param {String} folder Path to the folder
+   */
   constructor(folder) {
     super(`The folder \'${folder}\' does not exist`);
 
-    // use the name of the class as the name of the error
     this.name = this.constructor.name;
 
     this.applicationErrorCode = 1;
@@ -35,15 +37,16 @@ class DirectoryDoesNotExist extends Error {
 
 /**
  * File does not exist
+ * @class
  */
 class FileDoesNotExist extends Error {
   /**
-     * @param {String} file path to the file
-     */
+   * @constructor
+   * @param {String} file Path to the file
+   */
   constructor(file) {
     super(`The file \'${file}\' does not exist`);
 
-    // use the name of the class as the name of the error
     this.name = this.constructor.name;
 
     this.applicationErrorCode = 2;
@@ -53,15 +56,16 @@ class FileDoesNotExist extends Error {
 
 /**
  * Invalid json in file
+ * @class
  */
 class InvalidJsonfile extends Error {
   /**
-     * @param {String} file path to the file
-     */
+   * @constructor
+   * @param {String} file Path to the file
+   */
   constructor(file) {
     super(`The file \'${file}\' does not contain valid json data`);
 
-    // use the name of the class as the name of the error
     this.name = this.constructor.name;
 
     this.applicationErrorCode = 3;
@@ -71,15 +75,16 @@ class InvalidJsonfile extends Error {
 
 /**
  * Invalid configuration schema
+ * @class
  */
 class InvalidConfigSchema extends Error {
   /**
-   * @param {String} validationMessage error message from the validator
+   * @constructor
+   * @param {String} validationMessage Error message from the validator
    */
   constructor(validationMessage) {
     super(`The configuration is invalid | ${validationMessage}`);
 
-    // use the name of the class as the name of the error
     this.name = this.constructor.name;
 
     this.applicationErrorCode = 4;
