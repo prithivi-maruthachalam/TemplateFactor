@@ -2,6 +2,8 @@ const Joi = require('joi');
 const checkGlob = require('is-valid-glob');
 const {InvalidConfigSchema} = require('./errors');
 
+// TODO: allow to exclude file content alone
+
 // Joi Schema for configuration object
 const CONFIGURATION_SCHEMA = Joi.object({
   name: Joi.string().alphanum(),

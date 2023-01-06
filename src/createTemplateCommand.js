@@ -4,6 +4,7 @@ const globToRegexp = require('glob-to-regexp');
 const {DirectoryDoesNotExist, FileDoesNotExist, InvalidJsonfile, UnknownError} = require('./errors');
 const {validateConfig} = require('./validation');
 const dirTree = require('directory-tree');
+const { chdir } = require('process');
 
 const DEFAULT_FILE = 'tf.config.json';
 
@@ -41,12 +42,62 @@ class CreateTemplateCommand {
 
     // todo: check if name already exists
 
-    this.#getDirTree();
+    const directoryTree = this.#getDirTree();
+    const template = this.#makeTemplateObject(directoryTree);
+
+    console.debug(template)
+  }
+
+  #makeTemplateObject(dTree) {
+    const templateObject = {};
+    templateObject.name = this.fullConfiguration.name;
+    templateObject.filesIncluded = this.fullConfiguration.saveFiles;
+    templateObject.fileContentsIncluded = this.fullConfiguration.saveFiles && this.fullConfiguration.saveFileContent;
+    templateObject.fileContentType = (!templateObject.fileContentsIncluded) ? "NONE" : ((this.fullConfiguration.optimizeStorage) ? "LINK" : "CONTENT")
+
+    // parse the directory tree and populate the template object
+    templateObject.filesAndFolders = this.#parseAndDeflateTree(templateObject, dTree.children ?? [], [])
+    return templateObject
+  }
+
+  #parseAndDeflateTree(templateObject, dTreeChildArray, resultArray){
+    dTreeChildArray.forEach(child => {
+      const obj = {
+        entity : child.path.replace(this.absoluteSrcDir + "/", ""),
+        isFile: (child.children) ? false : true 
+      }
+
+      if(obj.isFile == false){
+        resultArray.push(obj)
+      } else if (obj.isFile == true && templateObject.filesIncluded == true) {
+        if(templateObject.fileContentsIncluded == true) {
+          if(templateObject.fileContentType == "LINK") {
+            obj.fileContent = {
+              link: child.path
+            }
+          } else if(templateObject.fileContentType == "CONTENT"){
+            obj.fileContent = {
+              content: fs.readFileSync(child.path)
+            }
+          }
+        }
+
+        resultArray.push(obj)
+      }
+      
+
+      if(obj.isFile == false) {
+        // if this is a folder, recurse for children
+        resultArray = this.#parseAndDeflateTree(templateObject, child.children, resultArray)
+      }
+    })
+
+    return resultArray
   }
 
   /**
    * Parses the configuration and returns a dir tree of the source directory
-   * 
+   *
    * @return {Object} Tree representing the dir structure
    */
   #getDirTree() {
@@ -68,7 +119,7 @@ class CreateTemplateCommand {
     const fsTree = dirTree(this.absoluteSrcDir,
         {exclude: this.fullConfiguration.exclude},
     );
-    
+
     return fsTree;
   }
 
@@ -80,36 +131,38 @@ class CreateTemplateCommand {
    */
   #getConfig(configFile) {
     if (!configFile) {
-      console.warn(`No config file specified, looking for '${DEFAULT_FILE}'`);
-      return this.#getConfig(DEFAULT_FILE);
+      // if the config file is not specific, recurse with the default file as the parameter
+      console.warn(`No config file specified, looking for '${DEFAULT_FILE}' in template srouce directory`);
+      return this.#getConfig(path.join(this.absoluteSrcDir, DEFAULT_FILE));
     }
 
-    // Full path to the file to look for
-    const absolutePath = path.join(this.absoluteSrcDir, configFile);
+    configFile = path.resolve(configFile); // resolve absolute path for config file
 
     // Check if file exists
-    if (!fs.existsSync(absolutePath)) {
-      if (configFile != DEFAULT_FILE) {
-        throw new FileDoesNotExist(absolutePath);
+    if (!fs.existsSync(configFile)) {
+      if (configFile != path.join(this.absoluteSrcDir, DEFAULT_FILE)) {
+        // if the file we're looking for is not the default file, throw an error
+        throw new FileDoesNotExist(configFile);
       } else {
+        // if it is the default file that we were looking for, issue a warning and continue with default configuration
         console.log('No configuration file found. Using standard configuration');
 
         // Return empty object if no configuration is available
         return {};
       }
     } else {
-      console.log(`Configuration file found at '${absolutePath}'`);
+      console.log(`Configuration file found at '${configFile}'`);
     }
 
     let configObject = {};
     try {
-      const configContent = fs.readFileSync(absolutePath);
+      const configContent = fs.readFileSync(configFile);
       configObject = JSON.parse(configContent);
     } catch (error) {
       if (error instanceof SyntaxError) {
-        throw new InvalidJsonfile(absolutePath);
+        throw new InvalidJsonfile(configFile);
       } else {
-        throw new UnknownError();
+        throw new UnknownError(error);
       }
     }
 

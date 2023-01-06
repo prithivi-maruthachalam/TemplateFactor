@@ -5,9 +5,10 @@
 class UnknownError extends Error {
   /**
    * @constructor
+   * @param {Object} originalError The original error object
    */
-  constructor() {
-    super(`An unknown error occurred`);
+  constructor(originalError) {
+    super(`An unknown error occurred : ` + originalError.message);
 
     // Use the name of the class as the name of the error
     this.name = this.constructor.name;
