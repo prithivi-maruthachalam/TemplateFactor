@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 const {Command} = require('commander'); // to parse command line arguments
-const {CreateTemplateCommand} = require('./createTemplateCommand');
+const {Template} = require('./template');
 
 /**
  * Sets up and parses command line arguments using commander
@@ -30,10 +30,7 @@ const setupCmdArgs = () => {
       .option('-x, --saveFileContent', 'to include file content in the template')
       .option('-s, --optimizeStorage', 'to optimize storage for storing file content')
       .action((srcDir, options) => {
-        new CreateTemplateCommand(
-            srcDir,
-            options,
-        );
+        new Template(srcDir, options);
       });
 
   cliProgram.parse();

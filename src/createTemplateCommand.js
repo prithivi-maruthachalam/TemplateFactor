@@ -1,10 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const globToRegexp = require('glob-to-regexp');
-const {DirectoryDoesNotExist, FileDoesNotExist, InvalidJsonfile, UnknownError} = require('./errors');
-const {validateConfig} = require('./validation');
+const {DirectoryDoesNotExist, InvalidJsonfile, UnknownError} = require('./errors');
 const dirTree = require('directory-tree');
-const { chdir } = require('process');
 
 const DEFAULT_FILE = 'tf.config.json';
 
@@ -45,54 +43,54 @@ class CreateTemplateCommand {
     const directoryTree = this.#getDirTree();
     const template = this.#makeTemplateObject(directoryTree);
 
-    console.debug(template)
+    console.debug(template);
   }
 
   #makeTemplateObject(dTree) {
     const templateObject = {};
     templateObject.name = this.fullConfiguration.name;
-    templateObject.filesIncluded = this.fullConfiguration.saveFiles;
-    templateObject.fileContentsIncluded = this.fullConfiguration.saveFiles && this.fullConfiguration.saveFileContent;
-    templateObject.fileContentType = (!templateObject.fileContentsIncluded) ? "NONE" : ((this.fullConfiguration.optimizeStorage) ? "LINK" : "CONTENT")
+    templateObject.filesIncluded = this.fullConfiguration.saveFiles ?? false;
+    templateObject.fileContentsIncluded = (this.fullConfiguration.saveFiles && this.fullConfiguration.saveFileContent) ?? false;
+    templateObject.fileContentType = (!templateObject.fileContentsIncluded) ? 'NONE' : ((this.fullConfiguration.optimizeStorage) ? 'LINK' : 'CONTENT');
 
     // parse the directory tree and populate the template object
-    templateObject.filesAndFolders = this.#parseAndDeflateTree(templateObject, dTree.children ?? [], [])
-    return templateObject
+    templateObject.filesAndFolders = this.#parseAndDeflateTree(templateObject, dTree.children ?? [], []);
+    return templateObject;
   }
 
-  #parseAndDeflateTree(templateObject, dTreeChildArray, resultArray){
-    dTreeChildArray.forEach(child => {
+  #parseAndDeflateTree(templateObject, dTreeChildArray, resultArray) {
+    dTreeChildArray.forEach((child) => {
       const obj = {
-        entity : child.path.replace(this.absoluteSrcDir + "/", ""),
-        isFile: (child.children) ? false : true 
-      }
+        entity: child.path.replace(this.absoluteSrcDir + '/', ''),
+        isFile: (child.children) ? false : true,
+      };
 
-      if(obj.isFile == false){
-        resultArray.push(obj)
+      if (obj.isFile == false) {
+        resultArray.push(obj);
       } else if (obj.isFile == true && templateObject.filesIncluded == true) {
-        if(templateObject.fileContentsIncluded == true) {
-          if(templateObject.fileContentType == "LINK") {
+        if (templateObject.fileContentsIncluded == true) {
+          if (templateObject.fileContentType == 'LINK') {
             obj.fileContent = {
-              link: child.path
-            }
-          } else if(templateObject.fileContentType == "CONTENT"){
+              link: child.path,
+            };
+          } else if (templateObject.fileContentType == 'CONTENT') {
             obj.fileContent = {
-              content: fs.readFileSync(child.path)
-            }
+              content: fs.readFileSync(child.path),
+            };
           }
         }
 
-        resultArray.push(obj)
+        resultArray.push(obj);
       }
-      
 
-      if(obj.isFile == false) {
+
+      if (obj.isFile == false) {
         // if this is a folder, recurse for children
-        resultArray = this.#parseAndDeflateTree(templateObject, child.children, resultArray)
+        resultArray = this.#parseAndDeflateTree(templateObject, child.children, resultArray);
       }
-    })
+    });
 
-    return resultArray
+    return resultArray;
   }
 
   /**
