@@ -1,7 +1,7 @@
 const path = require('path');
 
 const getStorageDirPath = () => {
-  return path.join(path.dirname(process.cwd()), '.templates');
+  return path.join(process.cwd(), '.templates');
 };
 
 const getTemplateFileName = (templateName) => {
