@@ -5,7 +5,8 @@ const checkGlob = require('is-valid-glob');
 const globToRegexp = require('glob-to-regexp');
 const {FileDoesNotExist, InvalidConfigSchema} = require('./errors');
 
-const DEFAULT_FILE = 'tf.config.json';
+const DEFAULT_FILE = 'tf.config.json'; // the default name for the config file
+// Default configuration values
 const STANDARD_CONFIG = {
   saveFiles: false,
   saveFilesContent: false,
@@ -92,7 +93,7 @@ class Config {
   /* PRIVATE MEMBERS */
 
   /**
-   * Resolved the absolute path to the right configuration file
+   * Resolves the absolute path to the right configuration file
    *
    * @param {string} configFile path to the configuration file
    * @return {string} resolved configuration file location

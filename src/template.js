@@ -1,12 +1,12 @@
 const fs = require('fs');
 const path = require('path');
-const {Config} = require('./config');
 const buildFsTree = require('directory-tree');
-const {DirectoryDoesNotExist} = require('./errors');
-
+const {DirectoryDoesNotExist, TemplateExists} = require('./errors');
+const {Config} = require('./config');
+const {getStorageDirPath, getTemplateFileName} = require('./utils');
 
 /**
- * A template class
+ * A dir template class
  * @class
  */
 class Template {
@@ -24,16 +24,28 @@ class Template {
       throw new DirectoryDoesNotExist(this.absoluteSourceDirectory);
     }
 
-    // create a new configuration object
+    // checks, validates and creates a new configuration
     this.configuration = new Config(options, this.absoluteSourceDirectory);
 
-    // TODO: Check if a template already exists with this name
+    // Check if a template already exists with this name
+    const templateFilePath = path.join(
+        getStorageDirPath(),
+        getTemplateFileName(this.configuration.jsonConfig.name));
+    if (fs.existsSync(templateFilePath)) {
+      throw new TemplateExists(this.configuration.jsonConfig.name);
+    }
 
-    // TODO: Get a directory tree of the source directory based on configuration
+    // get a directory tree based on this configuration
     const fsTree = this.#getFsTree(this.configuration.exclude);
-    console.debug(fsTree);
+    // console.debug('Dir Tree', JSON.stringify(fsTree, null, 2));
+    // console.debug('Template Configuration', this.configuration);
 
-    // TODO: From directory tree and configuration generate the template json object
+    // recurse through the dir tree and configuration and generate the template document
+    this.templateJsonObject = this.#makeTemplateJsonObject(fsTree);
+    console.debug('Template', JSON.stringify(this.templateJsonObject, null, 2));
+
+    // TODO: Save the template object
+    fs.writeFileSync(templateFilePath, JSON.stringify(this.templateJsonObject));
   }
 
   /* PRIVATE MEMBERS */
@@ -49,6 +61,86 @@ class Template {
     return buildFsTree(this.absoluteSourceDirectory, {
       exclude: excludes,
     });
+  }
+
+  /**
+   *
+   * @param {Object} dTree The directory tree
+   * @param {Object} config Template configuration
+   * @return {Object} the json representation of the template
+   */
+  #makeTemplateJsonObject(dTree) {
+    const templateObject = {};
+
+    templateObject.name = this.configuration.jsonConfig.name;
+    templateObject.fileContentIncluded =
+      this.configuration.jsonConfig?.saveFileContent ?? false; // should file content be included in the template
+    templateObject.isContentLinked =
+      this.configuration.jsonConfig?.optimizeStorage ?? false; // if included, should the content be linked or included in the template itself
+
+    templateObject.filesAndFolders =
+      this.#parseAndDeflateTree(dTree.children ?? [], []);
+
+    return templateObject;
+  }
+
+  /**
+   * Returns a flat list of files and folders to include in the
+   * template with the specific files included (through glob patterns)
+   *
+   * @param {Object} dTreeChildArray
+   * @param {Object} resultArray
+   * @return {Array} A list of files and folders to include in the template
+   */
+  #parseAndDeflateTree(dTreeChildArray, resultArray) {
+    dTreeChildArray.forEach((child) => {
+      const obj = {
+        entity: child.path.replace(this.absoluteSourceDirectory + '/', ''),
+        isFile: (child.children) ? false : true,
+      };
+
+      if (obj.isFile == false) {
+        // if this is dir, definitely push
+        resultArray.push(obj);
+      } else {
+        // this is a file
+
+        // check if the file matches and include glob expr from the config
+        const isIncludeMatch = this.configuration.jsonConfig.include.some(
+            (rx) => rx.test(child.path),
+        );
+
+        if (this.configuration.jsonConfig.saveFiles == true || isIncludeMatch) {
+          // if the file is to be saved, push
+
+          if (this.configuration.jsonConfig.saveFileContent) {
+            // if file content is to be saved
+            if (this.configuration.jsonConfig.optimizeStorage == true) {
+              // if storage is to be optimised, just add a link
+              obj.fileContent = {
+                isLink: true,
+                data: child.path,
+              };
+            } else {
+              // storage does not have to be optimised
+              obj.fileContent = {
+                isLink: false,
+                data: fs.readFileSync(child.path),
+              };
+            }
+          }
+
+          resultArray.push(obj);
+        }
+      }
+
+      if (obj.isFile == false) {
+        // if this is a folder, recurse for children
+        resultArray = this.#parseAndDeflateTree(child.children, resultArray);
+      }
+    });
+
+    return resultArray;
   }
 }
 

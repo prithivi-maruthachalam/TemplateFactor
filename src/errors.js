@@ -93,10 +93,29 @@ class InvalidConfigSchema extends Error {
   }
 }
 
+/**
+ * Tempalate with this name already exists
+ * @class
+ */
+class TemplateExists extends Error {
+  /**
+   * @constructor
+   * @param {String} templateName Name of the template
+   */
+  constructor(templateName) {
+    super(`A template with the name \'${templateName}\' already exists. Run the command again with a differnt name`);
+
+    this.name = this.constructor.name;
+    this.applicationErrorCode = 5;
+    this.templateName = templateName;
+  }
+}
+
 module.exports = {
   DirectoryDoesNotExist,
   FileDoesNotExist,
   InvalidJsonfile,
   UnknownError,
   InvalidConfigSchema,
+  TemplateExists,
 };

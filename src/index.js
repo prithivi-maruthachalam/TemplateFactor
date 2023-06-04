@@ -2,6 +2,8 @@
 
 const {Command} = require('commander'); // to parse command line arguments
 const {Template} = require('./template');
+const {getStorageDirPath} = require('./utils');
+const fs = require('fs');
 
 /**
  * Sets up and parses command line arguments using commander
@@ -12,9 +14,10 @@ const setupCmdArgs = () => {
   cliProgram
       .name('templatefactory')
       .description('CLI tool for creating and using templates')
-      .summary('Create, use and manage templates')
+      .summary('Create, use and manage directory templates')
       .version('1.0.0');
 
+  // if an error occurs, show the help message
   cliProgram
       .showHelpAfterError();
 
@@ -26,9 +29,9 @@ const setupCmdArgs = () => {
       .option('-n, --name <templateName>', 'name for the new template')
       .option('-cf, --config <file>', 'path to configuration file')
       // flags
-      .option('-f, --saveFiles', 'to include files in the template')
-      .option('-x, --saveFileContent', 'to include file content in the template')
-      .option('-s, --optimizeStorage', 'to optimize storage for storing file content')
+      .option('-f, --saveFiles', 'to include files in the saved template (and not just folders)')
+      .option('-x, --saveFileContent', 'to include file content in the saved template')
+      .option('-s, --optimizeStorage', 'to not use extra storage for storing file content')
       .action((srcDir, options) => {
         new Template(srcDir, options);
       });
@@ -39,4 +42,7 @@ const setupCmdArgs = () => {
 /**
  * main
  */
+if (!fs.existsSync(getStorageDirPath())) {
+  fs.mkdirSync(getStorageDirPath());
+}
 setupCmdArgs();
