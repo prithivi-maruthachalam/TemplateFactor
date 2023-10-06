@@ -1,6 +1,5 @@
 node_modules/
 .vscode
 
-**/.templates
-test
-tf.config.json
+# Development folder with sample template forlder, configurations etc
+**/.dev
