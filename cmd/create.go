@@ -29,7 +29,7 @@ var commandConstants = struct {
 	Clobber:      FlagDef{"clobber", "x", "If set, an existing template with the same name will be overwritten without warning. [Default false]"},
 	FileIncludeList: FlagDef{"include-file", "i", `A list of glob patterns for files that should be included in the template, even if save-files is false.
 Can't be used with save-files or save-content`},
-	ExcludeList: FlagDef{"exclude", "I", "A set of glob patterns for directories and files to be exluded from the template. This overrides all other include/exclude options."},
+	ExcludeList: FlagDef{"exclude", "e", "A set of glob patterns for directories and files to be exluded from the template. This overrides all other include/exclude options."},
 	ContentIncludeList: FlagDef{"content-include", "c", `A list of glob patterns for files whose content will be included in the template, even if save-files, or save-content are false.
 Can't be used with content-exclude or with save-content`},
 	ContentExcludeList: FlagDef{"content-exclude", "C", `A list of glob patterns for files whose content will be excluded from the template, even if save-content is true.
@@ -44,8 +44,8 @@ var createCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		params := actions.CreateTemplateConfig{
-			TemplateName:       args[0],
-			SourceDirPath:      commandConstants.TemplateName.GetStringAndHandleErr(cmd),
+			SourceDirPath:      args[0],
+			TemplateName:       commandConstants.TemplateName.GetStringAndHandleErr(cmd),
 			SaveFiles:          commandConstants.SaveFiles.GetBoolAndHandleError(cmd),
 			SaveContent:        commandConstants.SaveContent.GetBoolAndHandleError(cmd),
 			StoreLink:          commandConstants.StoreLink.GetBoolAndHandleError(cmd),
