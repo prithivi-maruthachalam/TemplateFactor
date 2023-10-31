@@ -11,9 +11,15 @@ import (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "templatefactory",
-	Short: "A tool to create templates out of your directories/files and use them later!",
-	Long:  `A tool to create templates out of your directories/files and use them later!`,
+	Use:   "tfac",
+	Short: "Create resuable, reconfigurable templates out of your directories and files!",
+	Long: `
+TemplateFactory allows you to create 'templates' out of your directories, 
+files and their contents. You have the option to create templates with just dir structures, 
+just empty files or even include the content of a few specified files. You can then use your 
+templates to create directories anywhere else!
+`,
+
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
