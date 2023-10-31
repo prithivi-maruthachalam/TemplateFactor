@@ -1,13 +1,19 @@
 package cmd
 
-import "log"
+import (
+	"log"
+
+	"github.com/spf13/cobra"
+)
 
 type FlagDef struct {
 	Long  string
 	Short string
+	Help  string
 }
 
-func GetStringAndHandleErr(v string, err error) string {
+func (flag *FlagDef) GetStringAndHandleErr(cmd *cobra.Command) string {
+	v, err := cmd.Flags().GetString(flag.Long)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -15,7 +21,8 @@ func GetStringAndHandleErr(v string, err error) string {
 	return v
 }
 
-func GetBoolAndHandleError(v bool, err error) bool {
+func (flag *FlagDef) GetBoolAndHandleError(cmd *cobra.Command) bool {
+	v, err := cmd.Flags().GetBool(flag.Long)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -23,7 +30,8 @@ func GetBoolAndHandleError(v bool, err error) bool {
 	return v
 }
 
-func GetStringArrayAndHandleError(v []string, err error) []string {
+func (flag *FlagDef) GetStringArrayAndHandleError(cmd *cobra.Command) []string {
+	v, err := cmd.Flags().GetStringArray(flag.Long)
 	if err != nil {
 		log.Fatal(err)
 	}
