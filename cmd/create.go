@@ -29,12 +29,12 @@ var commandConstants = struct {
 	Clobber:      FlagDef{"clobber", "x", "If set, an existing template with the same name will be overwritten without warning. [Default false]"},
 	FileIncludeList: FlagDef{"include-file", "i", `A list of glob patterns for files that should be included in the template, even if save-files is false.
 Can't be used with save-files or save-content`},
-	ExcludeList: FlagDef{"exclude", "e", "A set of glob patterns for directories and files to be exluded from the template. This overrides all other include/exclude options."},
+	ExcludeList: FlagDef{"exclude", "e", "A set of glob patterns for directories and files to be excluded from the template. This overrides all other include/exclude options."},
 	ContentIncludeList: FlagDef{"content-include", "c", `A list of glob patterns for files whose content will be included in the template, even if save-files, or save-content are false.
 Can't be used with content-exclude or with save-content`},
 	ContentExcludeList: FlagDef{"content-exclude", "C", `A list of glob patterns for files whose content will be excluded from the template, even if save-content is true.
 Can't be used with content-include.`},
-	DryRun: FlagDef{"dry-run", "d", "If set, a template will be displayed, but not created. [Default faslse]"},
+	DryRun: FlagDef{"dry-run", "d", "If set, a template will be displayed, but not created. [Default false]"},
 }
 
 var createCmd = &cobra.Command{
