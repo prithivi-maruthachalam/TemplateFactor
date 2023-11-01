@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"log"
 	"regexp"
 )
@@ -21,7 +22,19 @@ type TemplateNode struct {
 	Content  string
 }
 
+func (node *TemplateNode) String() string {
+	nodeTypeStr := "dir"
+	if node.IsFile {
+		nodeTypeStr = "file"
+	}
+	return fmt.Sprintf("    - %s %s %s\n", node.NodePath, nodeTypeStr, node.Content)
+}
+
 type Template struct {
 	TemplateName string
 	Nodes        []TemplateNode
+}
+
+func (template *Template) AddNode(node TemplateNode) {
+	template.Nodes = append(template.Nodes, node)
 }

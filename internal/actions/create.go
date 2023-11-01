@@ -54,6 +54,51 @@ func CreateTemplate(params CreateTemplateConfig) {
 		log.Fatal(err)
 	}
 
+	newTemplate := internal.Template{
+		TemplateName: params.TemplateName,
+		Nodes:        []internal.TemplateNode{},
+	}
+
+	testExclude := func(full_path string) bool {
+		match, err := testGlobMatches(params.ExcludeList, full_path)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		return match
+	}
+
+	testFileInclude := func(full_path string) bool {
+		match, err := testGlobMatches(params.FileIncludeList, full_path)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		return match
+	}
+
+	testContentInclude := func(full_path string) bool {
+		match, err := testGlobMatches(params.ContentIncludeList, full_path)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		return match
+	}
+
+	testContentExclude := func(full_path string) bool {
+		match, err := testGlobMatches(params.ContentExcludeList, full_path)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		return match
+	}
+
 	// Recursively go through every file and dir in the source directory
 	err := filepath.Walk(params.SourceDirPath,
 		func(path string, info os.FileInfo, err error) error {
@@ -66,15 +111,57 @@ func CreateTemplate(params CreateTemplateConfig) {
 			}
 
 			relative_path := strings.Replace(path, params.SourceDirPath, "", 1)
-			match, err := testGlobMatches(params.ExcludeList, relative_path)
-			if err != nil {
-				log.Fatal(err)
-			}
+			relative_path = strings.TrimPrefix(relative_path, "/")
 
-			if !match {
-				fmt.Println(relative_path)
-			} else if info.IsDir() {
-				return filepath.SkipDir
+			if !testExclude(relative_path) {
+				/* This path doesn't match any exclude pattern
+				 * and can be included in the template
+				 */
+
+				if info.IsDir() {
+					// If this is a directory, add it to the template
+					newTemplate.AddNode(internal.TemplateNode{
+						NodePath: relative_path,
+						IsFile:   false,
+					})
+
+					fmt.Println(relative_path, "Dir", "Included")
+				} else {
+					/* This is a file. It needs to be added based on
+					 * other parameters
+					 */
+
+					if params.SaveFiles || params.SaveContent {
+						/* If saveFiles or saveContent is set to true, the file
+						 * can be added to the template
+						 */
+
+						if (params.SaveFiles || params.SaveContent) || (testFileInclude(relative_path)) {
+							// File should be added to the template
+							fileContent := ""
+
+							if (params.SaveContent && !testContentExclude(relative_path)) || (!params.SaveContent && testContentInclude(relative_path)) {
+								fileContent = "including content"
+							}
+
+							newTemplate.AddNode(internal.TemplateNode{
+								NodePath: relative_path,
+								IsFile:   true,
+								Content:  fileContent,
+							})
+						}
+					} else {
+						fmt.Println(relative_path, "File", "Excluded because no saveFiles or saveContent")
+					}
+				}
+			} else {
+				if info.IsDir() {
+					return filepath.SkipDir
+				}
+
+				fmt.Println(relative_path, "Skipped because ExcludeListMatch")
+
+				return nil
 			}
 
 			return nil
@@ -86,5 +173,5 @@ func CreateTemplate(params CreateTemplateConfig) {
 
 	fmt.Println("\n\nDeubgging")
 	spew.Dump(params)
-	// spew.Dump(newTemplate)
+	spew.Dump(newTemplate)
 }
