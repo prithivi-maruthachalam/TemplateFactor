@@ -7,12 +7,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bmatcuk/doublestar/v4"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/fatih/color"
 	"github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal"
 )
 
+// Contains the input configuration used to create a template
 type CreateTemplateConfig struct {
 	TemplateName       string
 	SourceDirPath      string `default:"."`
@@ -67,84 +66,73 @@ func (config *CreateTemplateConfig) String() string {
 	return str
 }
 
-func testGlobMatches(patterns []string, path string) (bool, error) {
-	for _, pattern := range patterns {
-		match, err := doublestar.Match(pattern, path)
-		if err != nil {
-			return false, err
-		}
-
-		if match {
-			return match, nil
-		}
+// Validates the input configuration. Returns an error if invalid.
+func (config *CreateTemplateConfig) Validate() error {
+	if !internal.ValidateTemplateName(config.TemplateName) {
+		return &internal.InvalidTemplateNameError{TemplateName: config.TemplateName}
 	}
 
-	return false, nil
+	if _, err := os.Stat(config.SourceDirPath); os.IsNotExist(err) {
+		return &internal.SourceDirNotFoundErr{SourceDir: config.SourceDirPath}
+	} else if err != nil {
+		return &internal.InternalError{Cause: err, Name: internal.SourceDirStatError}
+	}
+
+	return nil
 }
 
+// Creates a template from a given input configuration
 func CreateTemplate(params CreateTemplateConfig) {
-	color.Blue("Creating Template")
+	fmt.Println(internal.Info("Creating Template"))
 
-	// Validate Template Name
-	if !internal.ValidateTemplateName(params.TemplateName) {
-		log.Fatal(&internal.InvalidTemplateNameError{TemplateName: params.TemplateName})
-	}
-
-	// Validate that source dir exists
-	if _, err := os.Stat(params.SourceDirPath); os.IsNotExist(err) {
+	// validate input configuration
+	err := params.Validate()
+	if err != nil {
 		log.Fatal(err)
 	}
 
+	// setup a new template object
 	newTemplate := internal.Template{
 		TemplateName: params.TemplateName,
 		Nodes:        []internal.TemplateNode{},
 	}
 
+	// Tests for matches in a list of glob patterns against a path
+	testMatches := func(patterns []string, full_path string) bool {
+		match, err := internal.TestGlobMatches(patterns, full_path)
+
+		if err != nil {
+			log.Fatal(internal.InternalError{Cause: err, Name: internal.PatternMatchingError})
+		}
+
+		return match
+	}
+
+	// tests for matches in the exclude list
 	testExclude := func(full_path string) bool {
-		match, err := testGlobMatches(params.ExcludeList, full_path)
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		return match
+		return testMatches(params.ExcludeList, full_path)
 	}
 
+	// tests for matches in the file include list
 	testFileInclude := func(full_path string) bool {
-		match, err := testGlobMatches(params.FileIncludeList, full_path)
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		return match
+		return testMatches(params.FileIncludeList, full_path)
 	}
 
+	// tests for matches in the content include list
 	testContentInclude := func(full_path string) bool {
-		match, err := testGlobMatches(params.ContentIncludeList, full_path)
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		return match
+		return testMatches(params.ContentIncludeList, full_path)
 	}
 
+	// tests for matches in the content exclude list
 	testContentExclude := func(full_path string) bool {
-		match, err := testGlobMatches(params.ContentExcludeList, full_path)
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		return match
+		return testMatches(params.ContentExcludeList, full_path)
 	}
 
 	// Recursively go through every file and dir in the source directory
-	err := filepath.Walk(params.SourceDirPath,
+	err = filepath.Walk(params.SourceDirPath,
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
-				return err
+				return &internal.InternalError{Cause: err, Name: internal.FilePathWalkError}
 			}
 
 			if path == params.SourceDirPath {
@@ -153,7 +141,7 @@ func CreateTemplate(params CreateTemplateConfig) {
 
 			relative_path := strings.Replace(path, params.SourceDirPath, "", 1)
 			relative_path = strings.TrimPrefix(relative_path, "/")
-			fmt.Println(relative_path)
+			fmt.Println(internal.Debug(relative_path))
 
 			if !testExclude(relative_path) {
 				/* This path doesn't match any exclude pattern
@@ -182,7 +170,12 @@ func CreateTemplate(params CreateTemplateConfig) {
 							fileContent := ""
 
 							if (params.SaveContent && !testContentExclude(relative_path)) || (!params.SaveContent && testContentInclude(relative_path)) {
-								fileContent = "including content"
+								data, err := os.ReadFile(path)
+								if err != nil {
+									return &internal.InternalError{Cause: err, Name: internal.FileReadError}
+								}
+
+								fileContent = string(data)
 							}
 
 							newTemplate.AddNode(internal.TemplateNode{
@@ -193,12 +186,8 @@ func CreateTemplate(params CreateTemplateConfig) {
 						}
 					}
 				}
-			} else {
-				if info.IsDir() {
-					return filepath.SkipDir
-				}
-
-				return nil
+			} else if info.IsDir() {
+				return filepath.SkipDir
 			}
 
 			return nil
@@ -208,7 +197,6 @@ func CreateTemplate(params CreateTemplateConfig) {
 		log.Fatal(err)
 	}
 
-	fmt.Println("\n\nDeubgging")
 	spew.Dump(params)
 	spew.Dump(newTemplate)
 }

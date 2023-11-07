@@ -13,13 +13,9 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "tfac",
 	Short: "Create reusable, reconfigurable templates out of your directories and files!",
-	Long: `
-TemplateFactory allows you to create 'templates' out of your directories,
-files and their contents. You have the option to create templates with just dir structures,
-just empty files or even include the content of a few specified files. You can then use your
-templates to create directories anywhere else!
-`,
+	Long: `TemplateFactory allows you to create 'templates' out of your directories, files and their contents. You have the option to create templates with just dir structures, just empty files or even include the content of a few files. You can then use your templates to recreate those directories and files anywhere else!
 
+Remember that there are no limits to what can be part of a template. Use the include and exclude patterns to fully customize what goes into your templates!`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
