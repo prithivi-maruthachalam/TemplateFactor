@@ -9,6 +9,7 @@ import (
 
 	"github.com/bmatcuk/doublestar/v4"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/fatih/color"
 	"github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal"
 )
 
@@ -24,6 +25,46 @@ type CreateTemplateConfig struct {
 	FileIncludeList    []string
 	ContentExcludeList []string
 	ContentIncludeList []string
+}
+
+func (config *CreateTemplateConfig) String() string {
+	str := fmt.Sprintf("\n  Template Name: %s\n  Source Dir: %s\n  SaveFile?: %t\n  SaveContent?: %t\n  StoreLink?: %t\n  Clobber?: %t\n  DryRun?: %t\n",
+		config.TemplateName,
+		config.SourceDirPath,
+		config.SaveFiles,
+		config.SaveContent,
+		config.StoreLink,
+		config.Clobber,
+		config.DryRun)
+
+	str += "  ExcludeList: ("
+	for _, pat := range config.ExcludeList {
+		str += fmt.Sprintf("'%s' ", pat)
+	}
+	str += ")\n"
+
+	str += "  FileIncludeList: ("
+	for _, pat := range config.FileIncludeList {
+		str += fmt.Sprintf("'%s' ", pat)
+	}
+	str += ")\n"
+
+	str += "  ContentExcludeList: ("
+	for _, pat := range config.ContentExcludeList {
+		str += fmt.Sprintf("'%s' ", pat)
+	}
+	str += ")\n"
+
+	str += "  ContentIncludeList: ("
+	for _, pat := range config.ContentIncludeList {
+		str += fmt.Sprintf("'%s' ", pat)
+	}
+	str += ")\n"
+
+	str += strings.Repeat("-", 10)
+	str += "\n"
+
+	return str
 }
 
 func testGlobMatches(patterns []string, path string) (bool, error) {
@@ -42,7 +83,7 @@ func testGlobMatches(patterns []string, path string) (bool, error) {
 }
 
 func CreateTemplate(params CreateTemplateConfig) {
-	fmt.Println("Creating Template")
+	color.Blue("Creating Template")
 
 	// Validate Template Name
 	if !internal.ValidateTemplateName(params.TemplateName) {
@@ -112,6 +153,7 @@ func CreateTemplate(params CreateTemplateConfig) {
 
 			relative_path := strings.Replace(path, params.SourceDirPath, "", 1)
 			relative_path = strings.TrimPrefix(relative_path, "/")
+			fmt.Println(relative_path)
 
 			if !testExclude(relative_path) {
 				/* This path doesn't match any exclude pattern
@@ -125,7 +167,6 @@ func CreateTemplate(params CreateTemplateConfig) {
 						IsFile:   false,
 					})
 
-					fmt.Println(relative_path, "Dir", "Included")
 				} else {
 					/* This is a file. It needs to be added based on
 					 * other parameters
@@ -150,16 +191,12 @@ func CreateTemplate(params CreateTemplateConfig) {
 								Content:  fileContent,
 							})
 						}
-					} else {
-						fmt.Println(relative_path, "File", "Excluded because no saveFiles or saveContent")
 					}
 				}
 			} else {
 				if info.IsDir() {
 					return filepath.SkipDir
 				}
-
-				fmt.Println(relative_path, "Skipped because ExcludeListMatch")
 
 				return nil
 			}
