@@ -15,7 +15,11 @@ import (
 
 // Creates a template from a given input configuration
 func CreateTemplate(params CreateTemplateConfig) {
-	fmt.Println(tf_io.Info("Creating Template"))
+	if params.DryRun {
+		fmt.Println(tf_io.Info("Showing Template"))
+	} else {
+		fmt.Println(tf_io.Info("Creating Template"))
+	}
 
 	// validate input configuration
 	err := params.Validate()
@@ -130,11 +134,12 @@ func CreateTemplate(params CreateTemplateConfig) {
 		log.Fatal(err)
 	}
 
+	// Show the template that is going to be created
+	fmt.Println()
+	fmt.Println(newTemplate.Describe(params.StoreLink))
+
 	if params.DryRun {
-		fmt.Println(newTemplate.Describe(params.StoreLink))
+		// If this is a dry run, return here
 		return
 	}
-
-	fmt.Println(tf_io.Debug(params.String()))
-	fmt.Println(tf_io.Debug(newTemplate.String()))
 }
