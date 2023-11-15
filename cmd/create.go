@@ -6,7 +6,7 @@ package cmd
 import (
 	"log"
 
-	"github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/actions"
+	"github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/actions/create"
 	"github.com/spf13/cobra"
 )
 
@@ -43,7 +43,7 @@ var createCmd = &cobra.Command{
 	Long:  `Create a template from a source directory`,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		params := actions.CreateTemplateConfig{
+		params := create.CreateTemplateConfig{
 			SourceDirPath:      args[0],
 			TemplateName:       commandConstants.TemplateName.GetStringAndHandleErr(cmd),
 			SaveFiles:          commandConstants.SaveFiles.GetBoolAndHandleError(cmd),
@@ -56,7 +56,7 @@ var createCmd = &cobra.Command{
 			ContentExcludeList: commandConstants.ContentExcludeList.GetStringArrayAndHandleError(cmd),
 			ContentIncludeList: commandConstants.ContentIncludeList.GetStringArrayAndHandleError(cmd),
 		}
-		actions.CreateTemplate(params)
+		create.CreateTemplate(params)
 	},
 }
 
