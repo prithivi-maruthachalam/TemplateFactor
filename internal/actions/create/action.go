@@ -130,7 +130,7 @@ func CreateTemplate(params CreateTemplateConfig) {
 
 	// Show the template that is going to be created
 	fmt.Println()
-	fmt.Print(newTemplate.Describe())
+	fmt.Print(newTemplate.Describe(false))
 
 	if params.DryRun {
 		// return here, since this is a dry-run

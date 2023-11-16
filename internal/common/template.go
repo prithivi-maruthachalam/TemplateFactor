@@ -45,7 +45,7 @@ func (template *Template) String() string {
 	return str
 }
 
-func (template *Template) Describe() string {
+func (template *Template) Describe(printContent bool) string {
 	str := tf_io.Title(fmt.Sprintf("Template Name : %s\n", template.TemplateName))
 
 	// returns the depth from root for a given path
@@ -59,7 +59,7 @@ func (template *Template) Describe() string {
 		parts := strings.Split(node.NodePath, string(os.PathSeparator))
 		name := parts[len(parts)-1]
 		if node.IsFile {
-			return string(name)
+			return tf_io.FileName(name)
 		} else {
 			return tf_io.DirName(name)
 		}
@@ -97,6 +97,17 @@ func (template *Template) Describe() string {
 		}
 
 		str += "\n"
+	}
+
+	if printContent {
+		str += "\n"
+		for _, node := range template.Nodes {
+			if node.IsFile && node.IsContent {
+				str += tf_io.FileName(fmt.Sprintf("file: %s\n", node.NodePath))
+				str += tf_io.FileContent(node.Content)
+				str += "\n"
+			}
+		}
 	}
 
 	return str

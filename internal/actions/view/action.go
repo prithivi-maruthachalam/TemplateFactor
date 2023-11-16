@@ -8,7 +8,7 @@ import (
 	tf_storage "github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/storage"
 )
 
-func ViewTemplate(templateName string) {
+func ViewTemplate(templateName string, showContent bool) {
 	template, err := tf_storage.LoadTemplate(templateName)
 	if template == nil && err == nil {
 		log.Fatal(&tf_errors.TemplateNotFound{TemplateName: templateName})
@@ -16,5 +16,5 @@ func ViewTemplate(templateName string) {
 		log.Fatal(&tf_errors.InternalError{Cause: err, Name: tf_errors.StorageError})
 	}
 
-	fmt.Print(template.Describe())
+	fmt.Print(template.Describe(showContent))
 }
