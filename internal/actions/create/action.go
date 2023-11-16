@@ -9,6 +9,8 @@ import (
 
 	tf_common "github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/common"
 	tf_errors "github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/errors"
+	tf_io "github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/io"
+	"github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/storage"
 	tf_utils "github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/utils"
 )
 
@@ -129,10 +131,49 @@ func CreateTemplate(params CreateTemplateConfig) {
 
 	// Show the template that is going to be created
 	fmt.Println()
-	fmt.Println(newTemplate.Describe(params.StoreLink))
+	fmt.Println(newTemplate.Describe())
 
 	if params.DryRun {
 		// return here, since this is a dry-run
 		return
 	}
+
+	// Check if a certain template exists
+	testTemplateExists := func(templateName string) (bool, error) {
+		template, err := storage.LoadTemplate(templateName)
+		if template == nil && err == nil {
+			return false, nil
+		} else if err == nil {
+			return true, nil
+		}
+
+		return false, &tf_errors.InternalError{Cause: err, Name: tf_errors.StorageError}
+	}
+
+	// Store template and return an internal error if any
+	storeTemplate := func(template *tf_common.Template) error {
+		err = storage.StoreTemplate(&newTemplate)
+		if err != nil {
+			return &tf_errors.InternalError{Cause: err, Name: tf_errors.StorageError}
+		}
+		return nil
+	}
+
+	isExists, err := testTemplateExists(newTemplate.TemplateName)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if isExists && !params.Clobber {
+		fmt.Println(tf_io.Log_Warning(fmt.Sprintf("Template with name '%s' already exists. Re-run the command with a different template name or use the -x, --clobber flag to overwrite the existing template.", newTemplate.TemplateName)))
+		return
+	} else if isExists && params.Clobber {
+		fmt.Println(tf_io.Log_Warning(fmt.Sprintf("Template with name '%s' already exists; it will be overwritten", newTemplate.TemplateName)))
+	}
+
+	err = storeTemplate(&newTemplate)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(tf_io.Log_Info("Done"))
 }

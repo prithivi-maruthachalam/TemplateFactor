@@ -45,12 +45,8 @@ func (template *Template) String() string {
 	return str
 }
 
-func (template *Template) Describe(storelink bool) string {
-	str := tf_io.Title(fmt.Sprintf("Template Name : %s", template.TemplateName))
-	if storelink {
-		str += tf_io.SubtleText(" (stored as a link)")
-	}
-	str += "\n"
+func (template *Template) Describe() string {
+	str := tf_io.Title(fmt.Sprintf("Template Name : %s\n", template.TemplateName))
 
 	// returns the depth from root for a given path
 	getDepthFromPath := func(path string) int {

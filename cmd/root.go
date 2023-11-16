@@ -4,8 +4,11 @@ Copyright © 2023 Prithivi Maruthachalam <prithivimaruthachalam@gmail.com>
 package cmd
 
 import (
+	"log"
 	"os"
 
+	"github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/errors"
+	"github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/storage"
 	"github.com/spf13/cobra"
 )
 
@@ -40,4 +43,9 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	err := storage.TestAndCreateTemplateFactoryHome()
+	if err != nil {
+		log.Fatal(&errors.TemplateFactoryHomeCreationError{Path: storage.TF_HOME})
+	}
 }

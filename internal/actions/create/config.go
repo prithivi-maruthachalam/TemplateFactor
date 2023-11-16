@@ -15,7 +15,6 @@ type CreateTemplateConfig struct {
 	SourceDirPath      string `default:"."`
 	SaveFiles          bool   `default:"false"`
 	SaveContent        bool   `default:"false"`
-	StoreLink          bool   `default:"false"`
 	Clobber            bool   `default:"false"`
 	DryRun             bool   `default:"false"`
 	ExcludeList        []string
@@ -26,12 +25,11 @@ type CreateTemplateConfig struct {
 
 // Stringer implementation for CreateTemplateConfig
 func (config *CreateTemplateConfig) String() string {
-	str := fmt.Sprintf("\n  Template Name: %s\n  Source Dir: %s\n  SaveFile?: %t\n  SaveContent?: %t\n  StoreLink?: %t\n  Clobber?: %t\n  DryRun?: %t\n",
+	str := fmt.Sprintf("\n  Template Name: %s\n  Source Dir: %s\n  SaveFile?: %t\n  SaveContent?: %t\n  Clobber?: %t\n  DryRun?: %t\n",
 		config.TemplateName,
 		config.SourceDirPath,
 		config.SaveFiles,
 		config.SaveContent,
-		config.StoreLink,
 		config.Clobber,
 		config.DryRun)
 

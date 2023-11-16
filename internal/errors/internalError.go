@@ -10,6 +10,7 @@ const SourceDirStatError = "SourceDirStatError"
 const PatternMatchingError = "PatternMatchingError"
 const FilePathWalkError = "FilePathWalkError"
 const FileReadError = "FileReadError"
+const StorageError = "StorageError"
 
 // Internal error caused by some other function
 type InternalError struct {

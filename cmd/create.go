@@ -14,7 +14,6 @@ var commandConstants = struct {
 	TemplateName       FlagDef // StringArray
 	SaveFiles          FlagDef // Bool
 	SaveContent        FlagDef // Bool
-	StoreLink          FlagDef // Bool
 	Clobber            FlagDef // Bool
 	ExcludeList        FlagDef // StringArray
 	FileIncludeList    FlagDef // StringArray
@@ -25,7 +24,6 @@ var commandConstants = struct {
 	TemplateName: FlagDef{"name", "n", "The name of the template"},
 	SaveFiles:    FlagDef{"save-files", "f", "If set, files will also be saved to the template. Only directories are part of the template by default. [Default false]"},
 	SaveContent:  FlagDef{"save-content", "F", "If set, files and their content will be included in the template. [Default false]"},
-	StoreLink:    FlagDef{"store-link", "L", "If set, a link to the source directory will be stored instead of a copy to use as the template. [Default false]"},
 	Clobber:      FlagDef{"clobber", "x", "If set, an existing template with the same name will be overwritten without warning. [Default false]"},
 	FileIncludeList: FlagDef{"include-file", "i", `A list of glob patterns for files that should be included in the template, even if save-files is false.
 Can't be used with save-files or save-content`},
@@ -48,7 +46,6 @@ var createCmd = &cobra.Command{
 			TemplateName:       commandConstants.TemplateName.GetStringAndHandleErr(cmd),
 			SaveFiles:          commandConstants.SaveFiles.GetBoolAndHandleError(cmd),
 			SaveContent:        commandConstants.SaveContent.GetBoolAndHandleError(cmd),
-			StoreLink:          commandConstants.StoreLink.GetBoolAndHandleError(cmd),
 			Clobber:            commandConstants.Clobber.GetBoolAndHandleError(cmd),
 			DryRun:             commandConstants.DryRun.GetBoolAndHandleError(cmd),
 			ExcludeList:        commandConstants.ExcludeList.GetStringArrayAndHandleError(cmd),
@@ -86,16 +83,6 @@ func init() {
 		commandConstants.SaveContent.Short,
 		false,
 		commandConstants.SaveContent.Help)
-
-	/* If true, only a link to the source directory is stored. A
-	 * copy of the dir is not created for the template.
-	 * Note : This implies that changes to the original source dir
-	 * will change the template
-	 */
-	createCmd.Flags().BoolP(commandConstants.StoreLink.Long,
-		commandConstants.StoreLink.Short,
-		false,
-		commandConstants.StoreLink.Help)
 
 	// If a template with the same name exists, it will be overwritten
 	createCmd.Flags().BoolP(commandConstants.Clobber.Long,
