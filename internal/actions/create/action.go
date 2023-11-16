@@ -70,7 +70,7 @@ func CreateTemplate(params CreateTemplateConfig) {
 				return nil
 			}
 
-			relative_path := strings.Replace(path, params.SourceDirPath, "", 1)
+			relative_path := strings.TrimPrefix(path, params.SourceDirPath)
 			relative_path = strings.TrimPrefix(relative_path, "/")
 
 			if !testExclude(relative_path) {
