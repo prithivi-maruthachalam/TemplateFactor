@@ -10,6 +10,6 @@ type TemplateFactoryHomeCreationError struct {
 }
 
 func (err *TemplateFactoryHomeCreationError) Error() string {
-	return tf_io.Error_Title("\nTemplateFactoryHomeCreationError : ") +
+	return tf_io.Error_Title("TemplateFactoryHomeCreationError : ") +
 		tf_io.Error_Info("Error creating template factory home directory at '%s'", err.Path)
 }

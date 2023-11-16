@@ -24,7 +24,7 @@ func LoadTemplate(templateName string) (*common.Template, error) {
 		return nil, err
 	}
 
-	if encodedTemplate == "" {
+	if len(encodedTemplate) == 0 {
 		return nil, nil
 	}
 

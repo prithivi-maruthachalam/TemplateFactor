@@ -19,6 +19,6 @@ type InternalError struct {
 }
 
 func (err *InternalError) Error() string {
-	return tf_io.Error_Title("\nInternalError : ") + tf_io.Error_Title(err.Name) +
+	return tf_io.Error_Title("InternalError : ") + tf_io.Error_Title(err.Name) +
 		tf_io.Error_Info(fmt.Sprintf("\n%v", err.Cause))
 }

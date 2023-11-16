@@ -12,6 +12,6 @@ type SourceDirNotFoundErr struct {
 }
 
 func (err *SourceDirNotFoundErr) Error() string {
-	return tf_io.Error_Title("\nSourceDirNotFoundErr : ") +
+	return tf_io.Error_Title("SourceDirNotFoundErr : ") +
 		tf_io.Error_Title(fmt.Sprintf("The directory '%s' was not found", err.SourceDir))
 }

@@ -72,7 +72,6 @@ func CreateTemplate(params CreateTemplateConfig) {
 
 			relative_path := strings.Replace(path, params.SourceDirPath, "", 1)
 			relative_path = strings.TrimPrefix(relative_path, "/")
-			// fmt.Println(tf_io.Debug(relative_path))
 
 			if !testExclude(relative_path) {
 				/* This path doesn't match any exclude pattern
@@ -131,7 +130,7 @@ func CreateTemplate(params CreateTemplateConfig) {
 
 	// Show the template that is going to be created
 	fmt.Println()
-	fmt.Println(newTemplate.Describe())
+	fmt.Print(newTemplate.Describe())
 
 	if params.DryRun {
 		// return here, since this is a dry-run

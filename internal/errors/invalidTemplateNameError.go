@@ -12,7 +12,7 @@ type InvalidTemplateNameError struct {
 }
 
 func (err *InvalidTemplateNameError) Error() string {
-	return tf_io.Error_Title("\nInvalidTemplateNameError : ") +
+	return tf_io.Error_Title("InvalidTemplateNameError : ") +
 		tf_io.Error_Title(fmt.Sprintf("The name '%s' is Invalid", err.TemplateName)) +
 		tf_io.Error_Info("\nA valid template has to start with a letter and can only contain letters, numbers and underscores")
 }
