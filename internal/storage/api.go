@@ -1,21 +1,8 @@
 package storage
 
 import (
-	"os"
-	"path/filepath"
-
 	"github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/common"
-	"github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/utils"
 )
-
-var homedir = utils.GetUserHomeDir()
-var TF_HOME = filepath.Join(homedir, ".templatefactory")
-
-const home_permissions = 0777
-
-func TestAndCreateTemplateFactoryHome() error {
-	return os.MkdirAll(TF_HOME, home_permissions)
-}
 
 func StoreTemplate(template *common.Template) error {
 	encodedTemplate, err := encodeToGOB64(template)

@@ -74,8 +74,6 @@ func (template *Template) Describe() string {
 		}
 	}
 
-	// prevNodeDepth := 0
-	// openCount := 0
 	for i, currentNode := range template.Nodes {
 		// Depth of the current node
 		currentNodeDepth := getDepthFromPath(currentNode.NodePath)

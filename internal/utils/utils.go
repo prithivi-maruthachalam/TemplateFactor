@@ -2,11 +2,9 @@ package utils
 
 import (
 	"log"
-	"os"
 	"regexp"
 
 	"github.com/bmatcuk/doublestar/v4"
-	"github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/errors"
 )
 
 // Validates the name of the template
@@ -34,14 +32,4 @@ func TestGlobMatches(patterns []string, path string) (bool, error) {
 	}
 
 	return false, nil
-}
-
-// Gets the home directory for the given operating system
-func GetUserHomeDir() string {
-	homedir, err := os.UserHomeDir()
-	if err != nil {
-		log.Fatal(errors.HomePathNotFound{})
-	}
-
-	return homedir
 }

@@ -1,20 +1,15 @@
 package storage
 
 import (
-	"path/filepath"
 	"time"
 
 	"github.com/boltdb/bolt"
 )
 
-const db_name = "templatefactory.db"
 const bucket_name = "templatefactory_main.bucket"
-const db_permissions = 0644
-
-var db_path = filepath.Join(TF_HOME, db_name)
 
 func save(templateName, encodedTemplate string) error {
-	db, err := bolt.Open(db_path, db_permissions, &bolt.Options{
+	db, err := bolt.Open(db_path, db_file_permissions, &bolt.Options{
 		Timeout: 5 * time.Second,
 	})
 	if err != nil {
@@ -39,7 +34,7 @@ func save(templateName, encodedTemplate string) error {
 }
 
 func load(templateName string) (encodedTemplate string, err error) {
-	db, err := bolt.Open(db_path, db_permissions, &bolt.Options{
+	db, err := bolt.Open(db_path, db_file_permissions, &bolt.Options{
 		Timeout: 5 * time.Second,
 	})
 	if err != nil {
