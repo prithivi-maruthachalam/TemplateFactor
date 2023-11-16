@@ -8,19 +8,12 @@ import (
 	"strings"
 
 	tf_common "github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/common"
-	tf_errors "github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/common/errors"
-	tf_io "github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/common/io"
-	tf_utils "github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/common/utils"
+	tf_errors "github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/errors"
+	tf_utils "github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/utils"
 )
 
 // Creates a template from a given input configuration
 func CreateTemplate(params CreateTemplateConfig) {
-	if params.DryRun {
-		fmt.Println(tf_io.Info("Showing Template"))
-	} else {
-		fmt.Println(tf_io.Info("Creating Template"))
-	}
-
 	// validate input configuration
 	err := params.Validate()
 	if err != nil {
@@ -139,7 +132,7 @@ func CreateTemplate(params CreateTemplateConfig) {
 	fmt.Println(newTemplate.Describe(params.StoreLink))
 
 	if params.DryRun {
-		// If this is a dry run, return here
+		// return here, since this is a dry-run
 		return
 	}
 }

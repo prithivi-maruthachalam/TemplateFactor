@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	tf_io "github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/common/io"
+	tf_io "github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/io"
 )
 
 // Represents a single node in a template. This can be a directory or a file with or without content

@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
-	tf_errors "github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/common/errors"
-	tf_utils "github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/common/utils"
+	tf_errors "github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/errors"
+	tf_utils "github.com/prithivi-maruthachalam/TemplateFactory/templatefactory/internal/utils"
 )
 
 // Contains the input configuration used to create a template
