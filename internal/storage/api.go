@@ -18,6 +18,20 @@ func StoreTemplate(template *common.Template) error {
 	return nil
 }
 
+func DeleteTemplate(templateName string) error {
+	err := delete(templateName)
+	return err
+}
+
+func GetAllTemplates() ([]string, error) {
+	templates, err := getAllKeys()
+	if err != nil {
+		return nil, nil
+	}
+
+	return templates, nil
+}
+
 func LoadTemplate(templateName string) (*common.Template, error) {
 	encodedTemplate, err := load(templateName)
 	if err != nil {
