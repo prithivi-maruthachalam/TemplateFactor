@@ -7,11 +7,11 @@ import (
 )
 
 // Source directory was not found
-type SourceDirNotFoundErr struct {
+type SourceDirNotFoundError struct {
 	SourceDir string
 }
 
-func (err *SourceDirNotFoundErr) Error() string {
-	return tf_io.Error_Title("SourceDirNotFoundErr : ") +
+func (err *SourceDirNotFoundError) Error() string {
+	return tf_io.Error_Title("SourceDirNotFoundError : ") +
 		tf_io.Error_Title(fmt.Sprintf("The directory '%s' was not found", err.SourceDir))
 }

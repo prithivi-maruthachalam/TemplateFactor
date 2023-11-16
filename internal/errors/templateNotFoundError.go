@@ -7,11 +7,11 @@ import (
 )
 
 // Source directory was not found
-type TemplateNotFound struct {
+type TemplateNotFoundError struct {
 	TemplateName string
 }
 
-func (err *TemplateNotFound) Error() string {
-	return tf_io.Error_Title("TemplateNotFound : ") +
+func (err *TemplateNotFoundError) Error() string {
+	return tf_io.Error_Title("TemplateNotFoundError : ") +
 		tf_io.Error_Info(fmt.Sprintf("The template '%s' was not found", err.TemplateName))
 }

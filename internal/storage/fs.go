@@ -25,7 +25,7 @@ func CreateTemplateFactoryHomeIfNotExists() error {
 func GetUserHomeDir() string {
 	homedir, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatal(errors.HomePathNotFound{})
+		log.Fatal(errors.HomePathNotFoundError{})
 	}
 
 	return homedir

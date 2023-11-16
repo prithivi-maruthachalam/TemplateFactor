@@ -12,11 +12,11 @@ import (
 // Contains the input configuration used to create a template
 type CreateTemplateConfig struct {
 	TemplateName       string
-	SourceDirPath      string `default:"."`
-	SaveFiles          bool   `default:"false"`
-	SaveContent        bool   `default:"false"`
-	Clobber            bool   `default:"false"`
-	DryRun             bool   `default:"false"`
+	SourceDirPath      string
+	SaveFiles          bool
+	SaveContent        bool
+	Clobber            bool
+	DryRun             bool
 	ExcludeList        []string
 	FileIncludeList    []string
 	ContentExcludeList []string
@@ -70,7 +70,7 @@ func (config *CreateTemplateConfig) Validate() error {
 	}
 
 	if _, err := os.Stat(config.SourceDirPath); os.IsNotExist(err) {
-		return &tf_errors.SourceDirNotFoundErr{SourceDir: config.SourceDirPath}
+		return &tf_errors.SourceDirNotFoundError{SourceDir: config.SourceDirPath}
 	} else if err != nil {
 		return &tf_errors.InternalError{Cause: err, Name: tf_errors.SourceDirStatError}
 	}

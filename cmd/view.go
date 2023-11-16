@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var ShowContentFlag = FlagDef{"show-content", "s", "If set, the content for files will also be displayed."}
+var ShowContentFlag = FlagDef{"show-content", "s", "If set, the content for files will also be displayed. [Default false]", BoolFlagDefault{false}}
 
 var viewCommand = &cobra.Command{
 	Use:   "view [flags] template_name",
@@ -25,6 +25,6 @@ func init() {
 
 	viewCommand.Flags().BoolP(ShowContentFlag.Long,
 		ShowContentFlag.Short,
-		false,
+		ShowContentFlag.Default.GetDefaultBool(),
 		ShowContentFlag.Help)
 }

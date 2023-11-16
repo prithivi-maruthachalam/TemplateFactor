@@ -11,7 +11,7 @@ import (
 func ViewTemplate(templateName string, showContent bool) {
 	template, err := tf_storage.LoadTemplate(templateName)
 	if template == nil && err == nil {
-		log.Fatal(&tf_errors.TemplateNotFound{TemplateName: templateName})
+		log.Fatal(&tf_errors.TemplateNotFoundError{TemplateName: templateName})
 	} else if err != nil {
 		log.Fatal(&tf_errors.InternalError{Cause: err, Name: tf_errors.StorageError})
 	}

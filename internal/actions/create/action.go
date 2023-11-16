@@ -134,6 +134,7 @@ func CreateTemplate(params CreateTemplateConfig) {
 
 	if params.DryRun {
 		// return here, since this is a dry-run
+		fmt.Println(tf_io.Log_Warning("This is only a dry run. Run with the '-d, --dry-run' option set to false to create and save the template."))
 		return
 	}
 
